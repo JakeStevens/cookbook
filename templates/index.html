@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div id="search-container">
+    <input type="text" id="search-input" placeholder="Search recipes...">
+</div>
+
+<ul class="recipe-list" id="recipe-list">
+    {% for recipe in recipes %}
+    <li class="recipe-card">
+        <a href="recipe/{{ recipe.id }}.html">
+            <h3>{{ recipe.name }}</h3>
+            <span class="meta">{{ recipe.total_time }}</span>
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+
+<script src="static/search.js"></script>
+{% endblock %}
