@@ -13,7 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Load search index
-    fetch('search.json')
+    const searchIndexPath = searchInput.dataset.searchIndex || 'search.json';
+    fetch(searchIndexPath)
         .then(response => response.json())
         .then(data => {
             recipes = data;

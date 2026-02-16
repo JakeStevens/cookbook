@@ -2,7 +2,7 @@
 
 {% block content %}
 <div id="search-container">
-    <input type="text" id="search-input" placeholder="Search recipes...">
+    <input type="text" id="search-input" placeholder="Search recipes..." data-search-index="{{ root_path }}search.json">
 </div>
 
 <ul class="recipe-list" id="recipe-list">
