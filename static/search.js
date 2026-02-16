@@ -3,6 +3,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const recipeList = document.getElementById('recipe-list');
     let recipes = [];
 
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    }
+
     // Load search index
     fetch('search.json')
         .then(response => response.json())
@@ -10,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             recipes = data;
         });
 
-    searchInput.addEventListener('input', (e) => {
+    searchInput.addEventListener('input', debounce((e) => {
         const term = e.target.value.toLowerCase();
         
         // Filter recipes
@@ -27,5 +36,5 @@ document.addEventListener('DOMContentLoaded', () => {
                 </a>
             </li>
         `).join('');
-    });
+    }, 300));
 });
