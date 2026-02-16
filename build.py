@@ -28,7 +28,7 @@ def build():
     shutil.copytree(STATIC_DIR, os.path.join(OUTPUT_DIR, 'static'))
     
     # 3. Setup Jinja2
-    env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
+    env = Environment(loader=FileSystemLoader(TEMPLATE_DIR), autoescape=True)
     
     # 4. Fetch Data
     conn = get_db_connection()
