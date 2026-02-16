@@ -2,6 +2,7 @@ import sqlite3
 import os
 import json
 import shutil
+import concurrent.futures
 from jinja2 import Environment, FileSystemLoader
 from dotenv import load_dotenv
 
@@ -17,6 +18,22 @@ def get_db_connection():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
+
+_template_recipe = None
+
+def init_worker(template_dir):
+    global _template_recipe
+    env = Environment(loader=FileSystemLoader(template_dir))
+    _template_recipe = env.get_template('recipe.html')
+
+def process_recipe_task(recipe, output_dir):
+    output_path = os.path.join(output_dir, 'recipe', f"{recipe['id']}.html")
+    with open(output_path, 'w') as f:
+        f.write(_template_recipe.render(recipe=recipe, root_path='../'))
+
+def process_batch_task(recipes_batch, output_dir):
+    for recipe in recipes_batch:
+        process_recipe_task(recipe, output_dir)
 
 def build():
     # 1. Setup Output Directory
@@ -62,11 +79,16 @@ def build():
         f.write(template_index.render(recipes=recipes, root_path=''))
         
     # 6. Render Individual Recipes
-    template_recipe = env.get_template('recipe.html')
-    for recipe in recipes:
-        output_path = os.path.join(OUTPUT_DIR, 'recipe', f"{recipe['id']}.html")
-        with open(output_path, 'w') as f:
-            f.write(template_recipe.render(recipe=recipe, root_path='../'))
+    # Use ProcessPoolExecutor for CPU-bound rendering (Jinja2)
+    # ThreadPoolExecutor was tested and found slower due to GIL contention.
+    batch_size = 100
+    with concurrent.futures.ProcessPoolExecutor(initializer=init_worker, initargs=(TEMPLATE_DIR,)) as executor:
+        futures = [
+            executor.submit(process_batch_task, recipes[i:i + batch_size], OUTPUT_DIR)
+            for i in range(0, len(recipes), batch_size)
+        ]
+        for future in concurrent.futures.as_completed(futures):
+            future.result()
             
     # 7. Generate Search Index
     search_index = [
