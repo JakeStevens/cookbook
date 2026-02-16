@@ -16,14 +16,15 @@ A minimalist static site generator for creating a searchable cookbook website fr
 
 ## Setup
 
-1. **Virtual Environment**:
+1. **Install uv**:
+   Ensure `uv` is installed (e.g., `pip install uv`).
+
+2. **Install Dependencies**:
    ```bash
-   python3 -m venv .venv
-   source .venv/bin/activate  # On Linux/macOS
-   pip install -r requirements.txt
+   uv sync
    ```
 
-2. **Configuration**:
+3. **Configuration**:
    Create a `.env` file in the root directory and point it to your database:
    ```env
    DB_PATH=/path/to/your/paprika-downloader/recipes.db
@@ -32,16 +33,16 @@ A minimalist static site generator for creating a searchable cookbook website fr
 ## Usage
 
 ### Generate the Site
-Run the build script to parse the database and generate the static files:
+Run the build script using `uv`:
 ```bash
-python3 build.py
+uv run build.py
 ```
 The output will be located in the `dist/` directory.
 
 ### Preview the Site
 Serve the generated site locally:
 ```bash
-python3 -m http.server -d dist -b 0.0.0.0 8000
+uv run python -m http.server -d dist -b 0.0.0.0 8000
 ```
 Then navigate to `http://localhost:8000` in your browser.
 
