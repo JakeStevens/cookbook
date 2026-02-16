@@ -19,13 +19,25 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 
         // Render results
-        recipeList.innerHTML = filtered.map(recipe => `
-            <li class="recipe-card">
-                <a href="recipe/${recipe.id}.html">
-                    <h3>${recipe.title}</h3>
-                    <span class="meta">${recipe.total_time || ''}</span>
-                </a>
-            </li>
-        `).join('');
+        recipeList.innerHTML = '';
+        filtered.forEach(recipe => {
+            const li = document.createElement('li');
+            li.className = 'recipe-card';
+
+            const a = document.createElement('a');
+            a.href = `recipe/${recipe.id}.html`;
+
+            const h3 = document.createElement('h3');
+            h3.textContent = recipe.title;
+
+            const span = document.createElement('span');
+            span.className = 'meta';
+            span.textContent = recipe.total_time || '';
+
+            a.appendChild(h3);
+            a.appendChild(span);
+            li.appendChild(a);
+            recipeList.appendChild(li);
+        });
     });
 });
