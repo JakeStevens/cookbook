@@ -78,8 +78,8 @@ def test_search_xss_fix(page: Page, test_server):
     expect(page.locator("#xss-trigger")).to_have_count(0)
 
     # Check if the text content contains the HTML tag (escaped)
-    content = page.locator("#recipe-list").text_content()
-    assert "<img" in content
+    # Use expect to wait for the debounced rendering
+    expect(page.locator("#recipe-list")).to_contain_text("<img")
 
     # Test 2: Valid Input
     page.fill("#search-input", "Valid")

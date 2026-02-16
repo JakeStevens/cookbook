@@ -3,14 +3,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const recipeList = document.getElementById('recipe-list');
     let recipes = [];
 
+    function debounce(func, wait) {
+        let timeout;
+        return function(...args) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    }
+
     // Load search index
-    fetch('search.json')
+    const searchIndexPath = searchInput.dataset.searchIndex || 'search.json';
+    fetch(searchIndexPath)
         .then(response => response.json())
         .then(data => {
             recipes = data;
         });
 
-    searchInput.addEventListener('input', (e) => {
+    searchInput.addEventListener('input', debounce((e) => {
         const term = e.target.value.toLowerCase();
         
         // Filter recipes
@@ -39,5 +49,5 @@ document.addEventListener('DOMContentLoaded', () => {
             li.appendChild(a);
             recipeList.appendChild(li);
         });
-    });
+    }, 300));
 });
