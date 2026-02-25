@@ -23,7 +23,7 @@ _template_recipe = None
 
 def init_worker(template_dir):
     global _template_recipe
-    env = Environment(loader=FileSystemLoader(template_dir))
+    env = Environment(loader=FileSystemLoader(template_dir), autoescape=True)
     _template_recipe = env.get_template('recipe.html')
 
 def process_recipe_task(recipe, output_dir):
