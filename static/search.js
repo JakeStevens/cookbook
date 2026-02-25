@@ -30,6 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Render results
         recipeList.innerHTML = '';
+        const fragment = document.createDocumentFragment();
+
         filtered.forEach(recipe => {
             const li = document.createElement('li');
             li.className = 'recipe-card';
@@ -47,7 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
             a.appendChild(h3);
             a.appendChild(span);
             li.appendChild(a);
-            recipeList.appendChild(li);
+            fragment.appendChild(li);
         });
+
+        recipeList.appendChild(fragment);
     }, 300));
 });

@@ -23,7 +23,7 @@ _template_recipe = None
 
 def init_worker(template_dir):
     global _template_recipe
-    env = Environment(loader=FileSystemLoader(template_dir))
+    env = Environment(loader=FileSystemLoader(template_dir), autoescape=True)
     _template_recipe = env.get_template('recipe.html')
 
 def process_recipe_task(recipe, output_dir):
@@ -34,6 +34,24 @@ def process_recipe_task(recipe, output_dir):
 def process_batch_task(recipes_batch, output_dir):
     for recipe in recipes_batch:
         process_recipe_task(recipe, output_dir)
+
+def transform_recipe(row):
+    try:
+        data = json.loads(row['data'])
+    except (ValueError, TypeError):
+        data = {}
+
+    return {
+        'id': row['uid'],
+        'name': row['name'] or 'Untitled Recipe',
+        'description': data.get('description', ''),
+        'prep_time': data.get('prep_time', ''),
+        'cook_time': data.get('cook_time', ''),
+        'total_time': data.get('total_time', ''),
+        'servings': data.get('servings', ''),
+        'ingredients': data.get('ingredients', ''),
+        'directions': data.get('directions', '')
+    }
 
 def build():
     # 1. Setup Output Directory
@@ -54,24 +72,7 @@ def build():
     conn.close()
     
     # Transform data for templates
-    recipes = []
-    for row in recipes_query:
-        try:
-            data = json.loads(row['data'])
-        except (ValueError, TypeError):
-            data = {}
-        
-        recipes.append({
-            'id': row['uid'],
-            'name': row['name'] or 'Untitled Recipe',
-            'description': data.get('description', ''),
-            'prep_time': data.get('prep_time', ''),
-            'cook_time': data.get('cook_time', ''),
-            'total_time': data.get('total_time', ''),
-            'servings': data.get('servings', ''),
-            'ingredients': data.get('ingredients', ''),
-            'directions': data.get('directions', '')
-        })
+    recipes = [transform_recipe(row) for row in recipes_query]
 
     # 5. Render Index
     template_index = env.get_template('index.html')
