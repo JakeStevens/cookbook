@@ -3,6 +3,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const recipeList = document.getElementById('recipe-list');
     let recipes = [];
 
+    function escapeHTML(str) {
+        if (!str) return '';
+        return String(str).replace(/[&<>"']/g, function(m) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[m];
+        });
+    }
+
     function debounce(func, wait) {
         let timeout;
         return function(...args) {
@@ -31,9 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Render results
         recipeList.innerHTML = filtered.map(recipe => `
             <li class="recipe-card">
-                <a href="recipe/${recipe.id}.html">
-                    <h3>${recipe.title}</h3>
-                    <span class="meta">${recipe.total_time || ''}</span>
+                <a href="recipe/${escapeHTML(recipe.id)}.html">
+                    <h3>${escapeHTML(recipe.title)}</h3>
+                    <span class="meta">${escapeHTML(recipe.total_time || '')}</span>
                 </a>
             </li>
         `).join('');
