@@ -55,9 +55,18 @@ def transform_recipe(row):
 
 def build():
     # 1. Setup Output Directory
-    if os.path.exists(OUTPUT_DIR):
-        shutil.rmtree(OUTPUT_DIR)
-    os.makedirs(os.path.join(OUTPUT_DIR, 'recipe'))
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(os.path.join(OUTPUT_DIR, 'recipe'))
+    else:
+        # Clear directory contents instead of deleting the directory itself
+        # to preserve volume mounts.
+        for item in os.listdir(OUTPUT_DIR):
+            item_path = os.path.join(OUTPUT_DIR, item)
+            if os.path.isfile(item_path) or os.path.islink(item_path):
+                os.unlink(item_path)
+            elif os.path.isdir(item_path):
+                shutil.rmtree(item_path)
+        os.makedirs(os.path.join(OUTPUT_DIR, 'recipe'))
     
     # 2. Copy Static Assets
     shutil.copytree(STATIC_DIR, os.path.join(OUTPUT_DIR, 'static'))
